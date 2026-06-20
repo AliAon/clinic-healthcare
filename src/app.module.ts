@@ -7,12 +7,18 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './models/user.model';
+import { DoctorModule } from './modules/doctor/doctor.module';
+import { Doctor } from './models/doctor.model';
+import { PatientModule } from './modules/patient/patient.module';
+import { Patient } from './models/patient.model';
+import { AppointmentModule } from './modules/appointment/appointment.module';
+import { Appointment } from './models/appointment.model';
+import { StaffModule } from './modules/staff/staff.module';
+import { Staff } from './models/staff.model';
 
 @Module({
   imports: [
-    UsersModule,
     ConfigModule.forRoot({ isGlobal: true }),
-    AuthModule,
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.DB_HOST,
@@ -21,8 +27,14 @@ import { User } from './models/user.model';
       database: process.env.DATABASE,
       autoLoadModels: true,
       synchronize: true,
-      models: [User],
+      models: [User, Doctor, Patient, Appointment, Staff],
     }),
+    UsersModule,
+    AuthModule,
+    DoctorModule,
+    PatientModule,
+    AppointmentModule,
+    StaffModule,
   ],
   controllers: [AppController],
   providers: [AppService],

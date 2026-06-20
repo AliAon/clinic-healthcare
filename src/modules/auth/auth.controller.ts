@@ -1,20 +1,17 @@
 import { Body, Controller, Post, Req, Res } from '@nestjs/common';
 import { LoginDto, SignupDto } from './dto/auth.dto';
 import { messageUtil } from 'src/common/utils/message';
-import response from 'src/common/utils/response';
 import { AuthService } from './auth.service';
 import { comparePassword, hashPassword } from 'src/common/utils/password';
 import { jwtHelper } from 'src/common/utils/jwt';
+import type { Response } from 'express';
+import response from 'src/common/utils/response';
 
 @Controller('api/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post('signup')
-  async signup(
-    @Res() res: Response,
-    @Req() req: Request,
-    @Body() body: SignupDto,
-  ) {
+  async signup(@Res() res: Response, @Body() body: SignupDto) {
     const { username, email, password } = body;
     try {
       //validate input
@@ -63,11 +60,7 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(
-    @Res() res: Response,
-    @Req() req: Request,
-    @Body() body: LoginDto,
-  ) {
+  async login(@Res() res: Response, @Body() body: LoginDto) {
     const { email, password } = body;
 
     try {

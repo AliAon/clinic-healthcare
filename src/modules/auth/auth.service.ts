@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from 'src/models/user.model';
 
-type UserType = {
+export type UserType = {
   username: string;
   email: string;
   password?: string;
@@ -14,8 +14,6 @@ export class AuthService {
     @InjectModel(User)
     private readonly userModel: typeof User,
   ) {}
-
-  //crud
 
   async create(data: UserType): Promise<User> {
     return this.userModel.create(data);

@@ -18,6 +18,4 @@ export const getAuthBearerToken = (req: Request): string | undefined => {
   if (authHeader?.startsWith('Bearer ')) {
     return authHeader.split(' ')[1];
   }
-
-  return undefined;
 };
