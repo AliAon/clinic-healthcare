@@ -1,27 +1,34 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './interface/user.interface';
-import { CreateUserDto } from './dto/user.dto';
+import { InjectModel } from '@nestjs/sequelize';
+import { User } from 'src/models/user.model';
+import { UserType } from '../auth/auth.service';
 @Injectable()
 export class UsersService {
-  private users = [
-    { id: '1', name: 'John Doe' },
-    { id: '2', name: 'Jane Doe' },
-  ];
-  findAll(): User[] {
-    return this.users;
+  constructor(
+    @InjectModel(User)
+    private readonly userModel: typeof User,
+  ) {}
+
+  async findAll(query?: any): Promise<User[]> {
+    return this.userModel.findAll(query);
   }
-  findOne(id: any): User | undefined {
-    return this.users.find((user) => user.id === id);
+
+  async findOne(query: any): Promise<User | null> {
+    return this.userModel.findOne(query);
   }
-  create(user: User): void {
-    this.users.push(user);
+
+  async findbyid(query: any): Promise<User | null> {
+    return this.userModel.findByPk(query);
   }
-  update(id: any, user: User) {
-    const index = this.users.findIndex((user) => user.id === id);
-    this.users[index] = user;
-    return user;
+
+  async update(
+    query: any,
+    data: UserType,
+  ): Promise<[affectedCount: number, affectedRows: User[]]> {
+    return this.userModel.update(data, query);
   }
-  remove(id: any): void {
-    this.users = this.users.filter((user) => user.id !== id);
+
+  async delete(id: number): Promise<number> {
+    return await this.userModel.destroy({ where: { id } });
   }
 }

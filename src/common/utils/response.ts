@@ -1,5 +1,6 @@
 import { messageUtil } from './message';
 import { StatusCodes } from 'http-status-codes';
+import { Response as expressResponse } from 'express';
 type responseType = {
   success: boolean;
   message: string;
@@ -9,14 +10,19 @@ type responseType = {
 };
 
 class Response {
-  ExistallReady = async (res, message) => {
-    res.status(StatusCodes.CONFLICT, messageUtil.ALL_READY_EXIST).send({
+  ExistallReady = async (res: expressResponse, message: string) => {
+    res.status(StatusCodes.CONFLICT).send({
       success: false,
       message,
     });
   };
 
-  success = (res, message, data, token) => {
+  success = (
+    res: expressResponse,
+    message: string,
+    data: any,
+    token?: string | false,
+  ) => {
     const response: responseType = {
       success: true,
       message,
@@ -24,20 +30,20 @@ class Response {
 
     if (data) {
       response.data = data;
-      response.token = token;
+      response.token = token ? token : undefined;
     }
 
     res.status(StatusCodes.OK).send(response);
   };
 
-  authorizationError = (res, message) => {
+  authorizationError = (res: expressResponse, message: string) => {
     res.status(StatusCodes.UNAUTHORIZED).send({
       success: false,
       message,
     });
   };
 
-  serverError = (res, error) => {
+  serverError = (res: expressResponse, error) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
       success: false,
       error: error.toString(),
@@ -45,14 +51,14 @@ class Response {
     });
   };
 
-  notFound = (res, message) => {
+  notFound = (res: expressResponse, message: string) => {
     res.status(StatusCodes.NOT_FOUND).send({
       success: false,
       message,
     });
   };
 
-  badRequest = (res, message) => {
+  badRequest = (res: expressResponse, message: string) => {
     res.status(StatusCodes.BAD_REQUEST).send({
       success: false,
       message,

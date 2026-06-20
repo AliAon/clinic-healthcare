@@ -1,16 +1,18 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { NextFunction, Request, Response } from 'express';
-import { getAuthBearerToken } from 'src/common/utils/helper';
+import type { NextFunction, Request, Response } from 'express';
 import { jwtHelper } from 'src/common/utils/jwt';
 
 @Injectable()
 export class IsAuthMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    const token = getAuthBearerToken(req);
+    const authHeader = req.headers.authorization as string | undefined;
+    const token = authHeader?.split(' ')[1];
+
     if (token) {
-      const isVerified = jwtHelper.verify(token);
+      const isVerified = jwtHelper.verify(token) as any;
+
       if (isVerified) {
-        // req.userId = isVerified.id;
+        req.userId = isVerified?.id;
         next();
       } else {
         return res.status(401).json({
@@ -25,6 +27,5 @@ export class IsAuthMiddleware implements NestMiddleware {
         missingParameters: ['login_token'],
       });
     }
-    next();
   }
 }

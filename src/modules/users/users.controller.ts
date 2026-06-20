@@ -1,96 +1,24 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Post,
-  Put,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Req, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import type { Response, Request } from 'express';
-import { CreateUserDto } from './dto/user.dto';
+import response from 'src/common/utils/response';
+import { messageUtil } from 'src/common/utils/message';
 
-@Controller('users')
+@Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @Get('getall')
-  getAll(@Res() res: Response) {
+  async getAll(@Res() res: Response) {
     try {
-      return res.status(200).json({
-        message: 'success',
-        data: this.usersService.findAll(),
-      });
+      const allUser = await this.usersService.findAll();
+      console.log('allUser', allUser);
+      if (!allUser) {
+        return response.notFound(res, messageUtil.NOT_FOUND);
+      }
+      return response.success(res, messageUtil.OK, allUser);
     } catch (error) {
-      return res.status(500).json({
-        message: 'error',
-      });
-    }
-  }
-
-  @Post('create')
-  create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
-    try {
-      this.usersService.create(createUserDto);
-      return res.status(201).json({
-        message: 'success',
-        data: createUserDto,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message: 'error',
-      });
-    }
-  }
-
-  @Get('getbyid/:id')
-  getOne(@Res() res: Response, @Req() req: Request) {
-    try {
-      const { id } = req.params;
-      const user = this.usersService.findOne(id);
-      return res.status(200).json({
-        message: 'success',
-        data: user,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message: 'error',
-      });
-    }
-  }
-  @Put('update/:id')
-  update(
-    @Res() res: Response,
-    @Req() req: Request,
-    @Body() createUserDto: CreateUserDto,
-  ) {
-    const { id } = req.params;
-    const user = this.usersService.update(id, createUserDto);
-    try {
-      return res.status(200).json({
-        message: 'success',
-        data: user,
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message: 'error',
-      });
-    }
-  }
-
-  @Delete('delete/:id')
-  remove(@Res() res: Response, @Req() req: Request) {
-    const { id } = req.params;
-    this.usersService.remove(id);
-    try {
-      return res.status(200).json({
-        message: 'success',
-      });
-    } catch (error) {
-      return res.status(500).json({
-        message: 'error',
-      });
+      console.error(error);
+      return response.serverError(res, error);
     }
   }
 }
